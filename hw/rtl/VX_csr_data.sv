@@ -159,6 +159,8 @@ module VX_csr_data #(
             `CSR_MPM_LSU_ST_H   : read_data_r = 32'(perf_pipeline_if.lsu_stalls[`PERF_CTR_BITS-1:32]);
             `CSR_MPM_CSR_ST     : read_data_r = perf_pipeline_if.csr_stalls[31:0];
             `CSR_MPM_CSR_ST_H   : read_data_r = 32'(perf_pipeline_if.csr_stalls[`PERF_CTR_BITS-1:32]);
+            `CSR_MPM_ACTIVE_THREADS     : read_data_r = perf_pipeline_if.active_threads[31:0];
+            `CSR_MPM_ACTIVE_THREADS_H   : read_data_r = 32'(perf_pipeline_if.active_threads[`PERF_CTR_BITS-1:32]);
         `ifdef EXT_F_ENABLE    
             `CSR_MPM_FPU_ST     : read_data_r = perf_pipeline_if.fpu_stalls[31:0];
             `CSR_MPM_FPU_ST_H   : read_data_r = 32'(perf_pipeline_if.fpu_stalls[`PERF_CTR_BITS-1:32]);

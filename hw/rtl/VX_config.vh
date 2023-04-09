@@ -150,6 +150,8 @@
 // Machine Performance-monitoring counters
 `define CSR_MPM_BASE                12'hB00
 `define CSR_MPM_BASE_H              12'hB80
+`define CSR_MPM_ACTIVE_THREADS      12'hB1E	// active threads
+`define CSR_MPM_ACTIVE_THREADS_H    12'hB9E
 // PERF: pipeline
 `define CSR_MCYCLE                  12'hB00
 `define CSR_MCYCLE_H                12'hB80

@@ -106,6 +106,8 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
   uint64_t cycles = 0;
 
 #ifdef PERF_ENABLE    
+  // PERF: active threads
+  uint64_t active_threads = 0;
   // PERF: pipeline stalls
   uint64_t ibuffer_stalls = 0;
   uint64_t scoreboard_stalls = 0;
@@ -141,6 +143,7 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
   uint64_t tex_mem_reads = 0;
   uint64_t tex_mem_lat = 0;
 #endif
+
 #endif     
 
   uint64_t num_cores;
@@ -170,6 +173,9 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
     cycles = std::max<uint64_t>(cycles_per_core, cycles);
 
   #ifdef PERF_ENABLE
+    uint64_t active_threads_per_core = get_csr_64(staging_ptr, CSR_MPM_ACTIVE_THREADS);
+    if (num_cores > 1) fprintf(stream, "PERF: core%d: active threads=%ld\n", core_id, active_threads_per_core);
+    active_threads += active_threads_per_core;
     // PERF: pipeline    
     // ibuffer_stall
     uint64_t ibuffer_stalls_per_core = get_csr_64(staging_ptr, CSR_MPM_IBUF_ST);
@@ -333,6 +339,8 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
   fprintf(stream, "PERF: tex memory reads=%ld\n", tex_mem_reads);
   fprintf(stream, "PERF: tex memory latency=%d cycles\n", tex_avg_lat);
 #endif
+  double active_threads_cycles = (double(active_threads)/double(cycles));
+  fprintf(stream, "PERF: active threads per cycle=%f\n", active_threads_cycles);
 #endif
 
   // release allocated resources
