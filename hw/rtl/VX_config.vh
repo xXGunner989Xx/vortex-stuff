@@ -215,6 +215,9 @@
 `define CSR_MPM_TEX_READS_H         12'hB9B
 `define CSR_MPM_TEX_LAT             12'hB1C     // texture latency
 `define CSR_MPM_TEX_LAT_H           12'hB9C
+// PERF: memory reads
+`define CSR_MPM_COMMON_MEM_ACCESS   12'hB1E	// threads accessing common mem location
+`define CSR_MPM_COMMON_MEM_ACCESS_H 12'hB9E
 
 // Machine Information Registers
 `define CSR_MVENDORID   12'hF11

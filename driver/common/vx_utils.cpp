@@ -141,6 +141,8 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
   uint64_t tex_mem_reads = 0;
   uint64_t tex_mem_lat = 0;
 #endif
+  // PERF: common mem accesses
+  uint64_t common_mem_accesses = 0;
 #endif     
 
   uint64_t num_cores;
@@ -170,6 +172,9 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
     cycles = std::max<uint64_t>(cycles_per_core, cycles);
 
   #ifdef PERF_ENABLE
+    uint64_t common_mem_accesses_per_core = get_csr_64(staging_ptr, CSR_MPM_COMMON_MEM_ACCESS);
+    if (num_cores > 1) fprintf(stream, "PERF: core%d: common mem accesses=%ld\n", core_id, common_mem_accesses_per_core);
+    common_mem_accesses += common_mem_accesses_per_core;
     // PERF: pipeline    
     // ibuffer_stall
     uint64_t ibuffer_stalls_per_core = get_csr_64(staging_ptr, CSR_MPM_IBUF_ST);
@@ -333,6 +338,7 @@ extern int vx_dump_perf(vx_device_h device, FILE* stream) {
   fprintf(stream, "PERF: tex memory reads=%ld\n", tex_mem_reads);
   fprintf(stream, "PERF: tex memory latency=%d cycles\n", tex_avg_lat);
 #endif
+  fprintf(stream, "PERF: common mem accesses=%d\n", common_mem_accesses);
 #endif
 
   // release allocated resources

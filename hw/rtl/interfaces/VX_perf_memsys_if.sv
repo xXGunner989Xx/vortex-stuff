@@ -19,6 +19,7 @@ interface VX_perf_memsys_if ();
     wire [`PERF_CTR_BITS-1:0] mem_reads;
     wire [`PERF_CTR_BITS-1:0] mem_writes;
     wire [`PERF_CTR_BITS-1:0] mem_latency;
+    wire [`PERF_CTR_BITS-1:0] common_mem_accesses;
 
     modport master (
         output icache_reads,
@@ -34,7 +35,8 @@ interface VX_perf_memsys_if ();
         output smem_bank_stalls,
         output mem_reads,
         output mem_writes,
-        output mem_latency
+        output mem_latency,
+        output common_mem_accesses
     );
 
     modport slave (
@@ -51,7 +53,8 @@ interface VX_perf_memsys_if ();
         input smem_bank_stalls,
         input mem_reads,
         input mem_writes,
-        input mem_latency
+        input mem_latency,
+        input common_mem_accesses
     );
 
 endinterface

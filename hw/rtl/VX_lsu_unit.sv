@@ -13,6 +13,9 @@ module VX_lsu_unit #(
     VX_dcache_rsp_if.slave  dcache_rsp_if,
 
     // inputs
+    `ifdef PERF_ENABLE
+    VX_perf_memsys_if     perf_memsys_if,
+    `endif
     VX_lsu_req_if.slave     lsu_req_if,
 
     // outputs
@@ -311,6 +314,23 @@ module VX_lsu_unit #(
 `ifndef SYNTHESIS
     reg [`LSUQ_SIZE-1:0][(`NW_BITS + 32 + `NR_BITS + `UUID_BITS + 64 + 1)-1:0] pending_reqs;
     wire [63:0] delay_timeout = 10000 * (1 ** (`L2_ENABLE + `L3_ENABLE));
+
+`ifdef PERF_ENABLE
+    reg [`PERF_CTR_BITS-1:0] common_mem_accesses;
+    wire dcache_req_fire_any = (| dcache_req_fire);
+    always @(posedge clk) begin
+        if (reset) begin
+            common_mem_accesses <= 0;
+        end begin
+            if (dcache_req_fire_any) begin
+                if (req_tmask_dup == `NUM_THREADS'b1) begin
+                    common_mem_accesses <= common_mem_accesses + 1;
+                end
+            end
+        end
+    end
+    assign perf_memsys_if.common_mem_accesses = common_mem_accesses;
+`endif
 
     always @(posedge clk) begin
         if (reset) begin

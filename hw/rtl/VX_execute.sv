@@ -151,6 +151,9 @@ module VX_execute #(
         `SCOPE_BIND_VX_execute_lsu_unit
         .clk            (clk),
         .reset          (lsu_reset),
+    `ifdef PERF_ENABLE
+        .perf_memsys_if (perf_memsys_if),
+    `endif
     `ifdef EXT_TEX_ENABLE
         .dcache_req_if  (lsu_dcache_req_if),
         .dcache_rsp_if  (lsu_dcache_rsp_if),

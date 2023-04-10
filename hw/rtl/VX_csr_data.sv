@@ -217,6 +217,9 @@ module VX_csr_data #(
             // PERF: reserved            
             `CSR_MPM_RESERVED       : read_data_r = '0;
             `CSR_MPM_RESERVED_H     : read_data_r = '0;
+            // PERF: common mem accesses
+            `CSR_MPM_COMMON_MEM_ACCESS     : read_data_r = perf_memsys_if.common_mem_accesses[31:0];
+            `CSR_MPM_COMMON_MEM_ACCESS_H   : read_data_r = 32'(perf_memsys_if.common_mem_accesses[`PERF_CTR_BITS-1:32]);
         `endif
             
             `CSR_SATP      : read_data_r = 32'(csr_satp);
