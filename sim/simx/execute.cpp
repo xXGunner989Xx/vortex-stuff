@@ -202,7 +202,22 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
     for (uint32_t t = 0; t < num_threads; ++t) {
       if (!tmask_.test(t))
         continue;
-      if (func7 & 0x1) {
+      if (func7 == 0x30) {
+        switch (func3) {
+          case 1:
+            // RV32 Zbb: ROL
+            int shamt = rsdata[t][1].i & 0b1111;
+            rddata[t].i = (rsdata[t][0].i << shamt | rsdata[t][0].i >> (XLEN - shamt));
+            break;
+          case 5:
+            // RV32 Zbb: ROR
+            int shamt = rsdata[t][1].i & 0b1111;
+            rddata[t].i = (rsdata[t][0].i >> shamt | rsdata[t][0].i << (XLEN - shamt));
+            break;
+          default:
+            std::abort();
+        }
+      } else if (func7 & 0x1) {
         switch (func3) {
         case 0: {
           // RV32M: MUL
@@ -389,14 +404,51 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
         break;
       }
       case 5: {
-        if (func7) {
-          // RV64I: SRAI
-          Word result = WordI(rsdata[t][0].i) >> immsrc;
-          rddata[t].i = result;
+        if (immsrc == 0b001010000111) {
+          //RV32 Zbb: ORC.B
+          Word result = Word(0);
+          ushort result = 0;
+          for (int i = 0; i < XLEN / 8; i++) {
+            for (int j = i; j < 8 * i; j++) {
+              if ((Word(rsdata[t][0].i) >> j) & 0x1) {
+                result = (result << 1) + 1;
+                break;
+              } else {
+                result = result << 1;
+              }
+            }
+          }
+          switch (result) {
+            case (0b0000):
+              rddata[t].i = Word(0);
+              break;
+            case (0b0001):
+              rddata[t].i = Word(0xFF);
+              break;
+            case (0b0011):
+              rddata[t].i = Word(0xFFFF);
+              break;
+            case (0b0111):
+              rddata[t].i = Word(0xFFFFFF);
+              break;
+            case (0b1111):
+              rddata[t].i = Word(0xFFFFFFFF);
+              break;
+          }
+        } else if (func7 == 0x30) {
+          // RV32 Zbb: RORI
+          int shamt = immsrc & 0b1111;
+          rddata[t].i = (rsdata[t][0].i >> shamt | rsdata[t][0].i << (XLEN - shamt));
         } else {
-          // RV64I: SRLI
-          Word result = Word(rsdata[t][0].i) >> immsrc;
-          rddata[t].i = result;
+          if (func7) {
+            // RV64I: SRAI
+            Word result = WordI(rsdata[t][0].i) >> immsrc;
+            rddata[t].i = result;
+          } else {
+            // RV64I: SRLI
+            Word result = Word(rsdata[t][0].i) >> immsrc;
+            rddata[t].i = result;
+          }
         }
         break;
       }

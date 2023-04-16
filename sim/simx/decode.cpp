@@ -96,6 +96,13 @@ static const char* op_string(const Instr &instr) {
   case Opcode::LUI_INST:   return "LUI";
   case Opcode::AUIPC_INST: return "AUIPC";
   case Opcode::R_INST:
+    if (func7 == 0x30) {
+      switch (func3) {
+        case 1: return "ROL";
+        case 5: return "ROR";
+        default:
+          std::abort();
+      }
     if (func7 & 0x1) {
       switch (func3) {
       case 0: return "MUL";
@@ -130,7 +137,14 @@ static const char* op_string(const Instr &instr) {
     case 2: return "SLTI";
     case 3: return "SLTIU";
     case 4: return "XORI";
-    case 5: return func7 ? "SRAI" : "SRLI";
+    case 5:
+      if (imm == 0b001010000111) {
+        return "ORC.B";
+      } else if (func7 == 0x30) {
+        return "RORI";
+      } else {
+        return func7 ? "SRAI" : "SRLI";
+      }
     case 6: return "ORI";
     case 7: return "ANDI";
     default:
