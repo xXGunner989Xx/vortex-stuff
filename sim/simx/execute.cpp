@@ -204,16 +204,18 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
         continue;
       if (func7 == 0x30) {
         switch (func3) {
-          case 1:
+          case 1: {
             // RV32 Zbb: ROL
             int shamt = rsdata[t][1].i & 0b1111;
             rddata[t].i = (rsdata[t][0].i << shamt | rsdata[t][0].i >> (XLEN - shamt));
             break;
-          case 5:
+          }
+          case 5: {
             // RV32 Zbb: ROR
             int shamt = rsdata[t][1].i & 0b1111;
             rddata[t].i = (rsdata[t][0].i >> shamt | rsdata[t][0].i << (XLEN - shamt));
             break;
+          }
           default:
             std::abort();
         }
@@ -406,7 +408,6 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
       case 5: {
         if (immsrc == 0b001010000111) {
           //RV32 Zbb: ORC.B
-          Word result = Word(0);
           ushort result = 0;
           for (int i = 0; i < XLEN / 8; i++) {
             for (int j = i; j < 8 * i; j++) {
@@ -435,6 +436,8 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
               rddata[t].i = Word(0xFFFFFFFF);
               break;
           }
+        } else if (immsrc == 0b011010011000) {
+          // RV32 Zbb: REV8
         } else if (func7 == 0x30) {
           // RV32 Zbb: RORI
           int shamt = immsrc & 0b1111;

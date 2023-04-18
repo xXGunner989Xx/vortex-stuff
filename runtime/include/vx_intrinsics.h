@@ -194,6 +194,28 @@ inline int vx_num_cores() {
     return result;   
 }
 
+inline int vx_ror(unsigned rs1, unsigned rs2) {
+    // op: 0x33, func7: 0x30, func3: 0x5  
+    int result;
+    asm volatile (".insn r 0x33, 0x5, 0x30, %0, %1, %2" : "=r"(result) : "r"(rs1), "r"(rs2));
+    return result;  
+}
+
+inline int vx_rol(unsigned rs1, unsigned rs2) {
+    // op: 0x33, func7: 0x30, func3: 0x1  
+    int result;
+    asm volatile (".insn r 0x33, 0x1, 0x30, %0, %1, %2" : "=r"(result) : "r"(rs1), "r"(rs2));
+    return result;  
+}
+
+// need to figure out i-type intrinsic
+// inline int vx_rori(unsigned rs1, unsigned rs2) {
+//     // op: 0x13, func7: 0x30, func3: 0x5  
+//     int result;
+//     asm volatile (".insn i 0x13, 0x5 ...)
+//     return result;  
+// }
+
 inline void vx_fence() {
     asm volatile ("fence iorw, iorw");
 }

@@ -103,7 +103,7 @@ static const char* op_string(const Instr &instr) {
         default:
           std::abort();
       }
-    if (func7 & 0x1) {
+    } else if (func7 & 0x1) {
       switch (func3) {
       case 0: return "MUL";
       case 1: return "MULH";
@@ -140,6 +140,8 @@ static const char* op_string(const Instr &instr) {
     case 5:
       if (imm == 0b001010000111) {
         return "ORC.B";
+      } else if (imm == 0b011010011000) {
+        return "REV8";
       } else if (func7 == 0x30) {
         return "RORI";
       } else {
@@ -149,7 +151,7 @@ static const char* op_string(const Instr &instr) {
     case 7: return "ANDI";
     default:
       std::abort();
-    }  
+    }
   case Opcode::B_INST:
     switch (func3) {
     case 0: return "BEQ";

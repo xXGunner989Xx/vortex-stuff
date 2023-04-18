@@ -42,6 +42,8 @@ public:
     this->add_test("ftou", new Test_FTOU());
     this->add_test("itof", new Test_ITOF());
     this->add_test("utof", new Test_UTOF());
+    this->add_test("ror", new Test_ROR());
+    this->add_test("rol", new Test_ROL());
   #endif
   }
 
