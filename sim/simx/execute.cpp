@@ -408,36 +408,22 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
       case 5: {
         if (immsrc == 0b001010000111) {
           //RV32 Zbb: ORC.B
-          ushort result = 0;
-          for (int i = 0; i < XLEN / 8; i++) {
-            for (int j = i; j < 8 * i; j++) {
-              if ((Word(rsdata[t][0].i) >> j) & 0x1) {
-                result = (result << 1) + 1;
-                break;
-              } else {
-                result = result << 1;
-              }
-            }
+          uint result = 0;
+          for (int i = 0; i <= XLEN - 8; i += 8) {
+            uint8_t byte = rsdata[t][0].i >> i & 0xFF;
+            result |= byte ? 0xFF << i : 0;
           }
-          switch (result) {
-            case (0b0000):
-              rddata[t].i = Word(0);
-              break;
-            case (0b0001):
-              rddata[t].i = Word(0xFF);
-              break;
-            case (0b0011):
-              rddata[t].i = Word(0xFFFF);
-              break;
-            case (0b0111):
-              rddata[t].i = Word(0xFFFFFF);
-              break;
-            case (0b1111):
-              rddata[t].i = Word(0xFFFFFFFF);
-              break;
-          }
+          rddata[t].i = output;
         } else if (immsrc == 0b011010011000) {
           // RV32 Zbb: REV8
+          uint result = 0;
+          int j = XLEN - 8;
+          for (int i = 0; i <= XLEN - 8; i += 8) {
+            uint8_t byte = rsdata[t][0].i >> i & 0xFF;
+            result |= uint32_t(byte) << j;
+            j -= 8;
+          }
+          rddata[t].i = output;
         } else if (func7 == 0x30) {
           // RV32 Zbb: RORI
           int shamt = immsrc & 0b1111;
