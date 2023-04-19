@@ -664,10 +664,10 @@ public:
     auto c = (uint32_t*)dst;
     for (int i = 0; i < n; ++i) {
       
-      auto ref = 0;
-      for (int i = 0; i <= XLEN - 8; i += 8) {
-        uint8_t byte = a[i] >> i & 0xFF;
-        ref |= byte ? 0xFF << i : 0;
+      uint ref = 0;
+      for (int k = 0; k <= XLEN - 8; k += 8) {
+        uint8_t byte = a[i] >> k & 0xFF;
+        ref |= byte ? 0xFF << k : 0;
       }
       if (c[i] != ref) {
         std::cout << "error at result #" << i << ": expected=" << ref << ", actual=" << c[i] << ", a=" << a[i] << ", b=" << b[i] << std::endl;
@@ -692,10 +692,10 @@ public:
     auto b = (uint32_t*)src2;
     auto c = (uint32_t*)dst;
     for (int i = 0; i < n; ++i) {
-      auto ref = 0;
+      uint ref = 0;
       int j = XLEN - 8;
-      for (int i = 0; i <= XLEN - 8; i += 8) {
-        uint8_t byte = a[i] >> i & 0xFF;
+      for (int k = 0; k <= XLEN - 8; k += 8) {
+        uint8_t byte = a[i] >> k & 0xFF;
         ref |= uint32_t(byte) << j;
         j -= 8;
       }

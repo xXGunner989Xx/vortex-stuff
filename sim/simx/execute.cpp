@@ -406,21 +406,21 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
         break;
       }
       case 5: {
-        if (immsrc == 0b001010000111) {
+        if (immsrc == 0x287) {
           //RV32 Zbb: ORC.B
           uint result = 0;
           for (int i = 0; i <= XLEN - 8; i += 8) {
             uint8_t byte = rsdata[t][0].i >> i & 0xFF;
-            result |= byte ? 0xFF << i : 0;
+            result |= byte ? (0xFF << i) : 0;
           }
           rddata[t].i = result;
-        } else if (immsrc == 0b011010011000) {
+        } else if (immsrc == 0x698) {
           // RV32 Zbb: REV8
           uint result = 0;
           int j = XLEN - 8;
           for (int i = 0; i <= XLEN - 8; i += 8) {
             uint8_t byte = rsdata[t][0].i >> i & 0xFF;
-            result |= uint32_t(byte) << j;
+            result |= (uint32_t(byte) << j);
             j -= 8;
           }
           rddata[t].i = result;

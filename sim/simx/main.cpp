@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
   
     // attach memory module
     processor.attach_ram(&ram);   
-
+    
     // run simulation
     exitcode = processor.run();
 

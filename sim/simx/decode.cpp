@@ -138,9 +138,11 @@ static const char* op_string(const Instr &instr) {
     case 3: return "SLTIU";
     case 4: return "XORI";
     case 5:
-      if (imm == 0b001010000111) {
+      std::cout << "func3 = 5" << std::endl;
+      if (imm == 0x287) {
         return "ORC.B";
-      } else if (imm == 0b011010011000) {
+      } else if (imm == 0x698) {
+        std::cout << "rev8" << std::endl;
         return "REV8";
       } else if (func7 == 0x30) {
         return "RORI";
@@ -531,7 +533,7 @@ std::shared_ptr<Instr> Decoder::decode(uint32_t code) const {
       break;
     case Opcode::I_INST:
     case Opcode::I_INST_W:
-      if (func3 == 0x1 || func3 == 0x5) {
+      if ((func3 == 0x1 || func3 == 0x5) && !(func7 == 0x34 || func7 == 0x14)) {
         auto shamt = rs2; // uint5
       #if (XLEN == 64)
         if (op == Opcode::I_INST) {
