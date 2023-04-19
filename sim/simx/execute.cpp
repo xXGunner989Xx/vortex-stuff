@@ -406,6 +406,8 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
         break;
       }
       case 5: {
+        std::cout << immsrc << endl;
+        std::cout << func7 << endl;
         if (immsrc == 0x287) {
           //RV32 Zbb: ORC.B
           Word input = rsdata[t][0].i;
@@ -422,8 +424,9 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
           result = ((result & 0x0000FFFF) << 16) | ((result & 0xFFFF0000) >> 16);
           rddata[t].i = result;
         } else if (func7 == 0x30) {
+          std::cout << immsrc << endl;
           // RV32 Zbb: RORI
-          int shamt = immsrc & 0b1111;
+          int shamt = immsrc;
           rddata[t].i = (rsdata[t][0].i >> shamt | rsdata[t][0].i << (XLEN - shamt));
         } else {
           if (func7) {
