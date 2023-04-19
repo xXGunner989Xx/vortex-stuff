@@ -138,11 +138,9 @@ static const char* op_string(const Instr &instr) {
     case 3: return "SLTIU";
     case 4: return "XORI";
     case 5:
-      std::cout << "func3 = 5" << std::endl;
       if (imm == 0x287) {
         return "ORC.B";
       } else if (imm == 0x698) {
-        std::cout << "rev8" << std::endl;
         return "REV8";
       } else if (func7 == 0x30) {
         return "RORI";
