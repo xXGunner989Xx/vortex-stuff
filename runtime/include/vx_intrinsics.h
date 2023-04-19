@@ -212,7 +212,7 @@ inline int vx_rori(unsigned rs1, unsigned shamt) {
     // op: 0x13, func3: 0x5, shamt & func7 = 0x18
     int result;
     int imm = (0x18 << 4) | (shamt & 0b1111); // constructing imm12
-    asm volatile (".insn i 0x13, 0x5, %0, %1, %2" : "=r"(result) : "r"(rs1) : "i"(imm));
+    asm volatile (".insn i 0x13, 0x5, %0, %1, %2" : "=r"(result) : "r"(rs1), "i"(imm));
     return result;  
 }
 
