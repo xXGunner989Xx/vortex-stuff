@@ -406,8 +406,8 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
         break;
       }
       case 5: {
-        std::cout << immsrc << endl;
-        std::cout << func7 << endl;
+        std::cout << immsrc << std::endl;
+        std::cout << func7 << std::endl;
         if (immsrc == 0x287) {
           //RV32 Zbb: ORC.B
           Word input = rsdata[t][0].i;
