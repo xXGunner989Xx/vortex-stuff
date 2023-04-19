@@ -424,7 +424,7 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
           result = ((result & 0x0000FFFF) << 16) | ((result & 0xFFFF0000) >> 16);
           rddata[t].i = result;
         } else if (func7 == 0x30) {
-          std::cout << immsrc << endl;
+          std::cout << immsrc << std::endl;
           // RV32 Zbb: RORI
           int shamt = immsrc;
           rddata[t].i = (rsdata[t][0].i >> shamt | rsdata[t][0].i << (XLEN - shamt));
