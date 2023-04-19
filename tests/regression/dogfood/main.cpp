@@ -45,7 +45,7 @@ public:
   #endif
     this->add_test("ror", new Test_ROR());
     this->add_test("rol", new Test_ROL());
-    this->add_test("ror", new Test_RORI());
+    this->add_test("rori", new Test_RORI());
     this->add_test("orcb", new Test_ORCB());
     this->add_test("rev8", new Test_REV8());
   }
