@@ -413,7 +413,7 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
             uint8_t byte = rsdata[t][0].i >> i & 0xFF;
             result |= byte ? 0xFF << i : 0;
           }
-          rddata[t].i = output;
+          rddata[t].i = result;
         } else if (immsrc == 0b011010011000) {
           // RV32 Zbb: REV8
           uint result = 0;
@@ -423,7 +423,7 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
             result |= uint32_t(byte) << j;
             j -= 8;
           }
-          rddata[t].i = output;
+          rddata[t].i = result;
         } else if (func7 == 0x30) {
           // RV32 Zbb: RORI
           int shamt = immsrc & 0b1111;

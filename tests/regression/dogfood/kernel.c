@@ -351,6 +351,32 @@ void kernel_rol(int task_id, kernel_arg_t* arg) {
 // 	}
 // }
 
+void kernel_orcb(int task_id, kernel_arg_t* arg) {
+	uint32_t count    = arg->task_size;
+	int32_t* src0_ptr = (int32_t*)arg->src0_addr;
+	int32_t* dst_ptr  = (int32_t*)arg->dst_addr;	
+	uint32_t offset = task_id * count;
+
+	for (uint32_t i = 0; i < count; ++i) {
+		int32_t a = src0_ptr[offset+i];
+		int32_t c = vx_orcb(a);
+		dst_ptr[offset+i] = c;
+	}
+}
+
+void kernel_rev8(int task_id, kernel_arg_t* arg) {
+	uint32_t count    = arg->task_size;
+	int32_t* src0_ptr = (int32_t*)arg->src0_addr;
+	int32_t* dst_ptr  = (int32_t*)arg->dst_addr;	
+	uint32_t offset = task_id * count;
+
+	for (uint32_t i = 0; i < count; ++i) {
+		int32_t a = src0_ptr[offset+i];
+		int32_t c = vx_rev8(a);
+		dst_ptr[offset+i] = c;
+	}
+}
+
 static const PFN_Kernel sc_tests[] = {
 	kernel_iadd,
 	kernel_imul,
@@ -374,6 +400,8 @@ static const PFN_Kernel sc_tests[] = {
 	kernel_ror,
 	kernel_rol,
 	//kernel_rori,
+	kernel_orcb,
+	kernel_rev8,
 };
 
 void main() {

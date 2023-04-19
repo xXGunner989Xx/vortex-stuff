@@ -42,9 +42,11 @@ public:
     this->add_test("ftou", new Test_FTOU());
     this->add_test("itof", new Test_ITOF());
     this->add_test("utof", new Test_UTOF());
+  #endif
     this->add_test("ror", new Test_ROR());
     this->add_test("rol", new Test_ROL());
-  #endif
+    this->add_test("orcb", new Test_ORCB());
+    this->add_test("rev8", new Test_REV8());
   }
 
   ~TestMngr() {
