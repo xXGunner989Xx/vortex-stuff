@@ -408,7 +408,7 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
       case 5: {
         if (immsrc == 0x287) {
           //RV32 Zbb: ORC.B
-          Word input = rsdata[t][0].i
+          Word input = rsdata[t][0].i;
           Word result = 0;
           result |= (input & 0xFF) ? 0xFF : 0;
           result |= ((input >> 8) & 0xFF) ? (0xFF << 8) : 0;
