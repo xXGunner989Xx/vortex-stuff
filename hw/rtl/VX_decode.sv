@@ -43,6 +43,7 @@ module VX_decode  #(
     reg [31:0]          imm;    
     reg use_rd, use_PC, use_imm;
     reg is_join, is_wstall;
+    reg is_bitmanip;
 
     wire [31:0] instr = ifetch_rsp_if.data;
     wire [6:0] opcode = instr[6:0];  
@@ -82,6 +83,7 @@ module VX_decode  #(
 
         case (opcode)            
             `INST_I: begin
+                is_bitmanip = 0;
                 case (func3)
                     3'h0: op_type = `INST_OP_BITS'(`INST_ALU_ADD);
                     3'h1: op_type = `INST_OP_BITS'(`INST_ALU_SLL);
@@ -91,12 +93,15 @@ module VX_decode  #(
                     3'h5: begin
                         if (u_12 == 12'h287) begin
                             op_type = `INST_OP_BITS'(`INST_BITMANIP_ORCB);
+                            is_bitmanip = 1;
                         end
                         else if (u_12 == 12'h698) begin
                             op_type = `INST_OP_BITS'(`INST_BITMANIP_REV8);
+                            is_bitmanip = 1;
                         end
                         else if (u_12 == 12'h30) begin
                             op_type = `INST_OP_BITS'(`INST_BITMANIP_RORI);
+                            is_bitmanip = 1;
                         end
                         else begin
                            op_type = (func7[5]) ? `INST_OP_BITS'(`INST_ALU_SRA) : `INST_OP_BITS'(`INST_ALU_SRL);
@@ -106,15 +111,17 @@ module VX_decode  #(
                     3'h7: op_type = `INST_OP_BITS'(`INST_ALU_AND);
                     default:;
                 endcase
-                ex_type = (op_type == `INST_OP_BITS'(`INST_BITMANIP_ORCB) || op_type == `INST_OP_BITS'(`INST_BITMANIP_REV8) || op_type == `INST_OP_BITS'(`INST_BITMANIP_RORI)) ? `EX_BITMANIP : `EX_ALU;
+                ex_type = (is_bitmanip == 1) ? `EX_BITMANIP : `EX_ALU;
                 use_rd  = 1;
-                use_imm = (op_type == `INST_OP_BITS'(`INST_BITMANIP_ORCB) || op_type == `INST_OP_BITS'(`INST_BITMANIP_REV8)) ? 0 : 1;
+                use_imm = (is_bitmanip == 1) ? 0 : 1;
                 imm     = {{20{alu_imm[11]}}, alu_imm};
                 `USED_IREG (rd);
                 `USED_IREG (rs1);
             end
             `INST_R: begin 
+                is_bitmanip = 0;
                 if (func7 == 7'h30) begin
+                    is_bitmanip = 1;
                     case (func3)
                         3'h1: op_type = `INST_OP_BITS'(`INST_BITMANIP_ROL);
                         3'h5: op_type = `INST_OP_BITS'(`INST_BITMANIP_ROR);
@@ -150,7 +157,7 @@ module VX_decode  #(
                         default:;
                     endcase
                 end          
-                ex_type = (op_type == `INST_OP_BITS'(`INST_BITMANIP_ROL) || op_type == `INST_OP_BITS'(`INST_BITMANIP_ROR)) ? `EX_BITMANIP : `EX_ALU;
+                ex_type = (is_bitmanip == 1) ? `EX_BITMANIP : `EX_ALU;
                 use_rd = 1;
                 `USED_IREG (rd);
                 `USED_IREG (rs1);
