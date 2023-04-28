@@ -8,6 +8,7 @@ module VX_writeback #(
 
     // inputs
     VX_commit_if.slave  alu_commit_if,
+    VX_commit_if.slave  bitmanip_commit_if,
     VX_commit_if.slave  ld_commit_if,  
     VX_commit_if.slave  csr_commit_if,
 `ifdef EXT_F_ENABLE
@@ -23,9 +24,9 @@ module VX_writeback #(
 
     localparam DATAW = `NW_BITS + 32 + `NUM_THREADS + `NR_BITS + (`NUM_THREADS * 32) + 1;
 `ifdef EXT_F_ENABLE
-    localparam NUM_RSPS = 5;
+    localparam NUM_RSPS = 6;
 `else
-    localparam NUM_RSPS = 4;
+    localparam NUM_RSPS = 5;
 `endif
 
     wire wb_valid;
@@ -45,6 +46,7 @@ module VX_writeback #(
         gpu_commit_if.valid && gpu_commit_if.wb,
         csr_commit_if.valid && csr_commit_if.wb,
         alu_commit_if.valid && alu_commit_if.wb,        
+        bitmanip_commit_if.valid && bitmanip_commit_if.wb,        
     `ifdef EXT_F_ENABLE
         fpu_commit_if.valid && fpu_commit_if.wb,
     `endif
@@ -55,6 +57,7 @@ module VX_writeback #(
         {gpu_commit_if.wid, gpu_commit_if.PC, gpu_commit_if.tmask, gpu_commit_if.rd, gpu_commit_if.data, gpu_commit_if.eop},
         {csr_commit_if.wid, csr_commit_if.PC, csr_commit_if.tmask, csr_commit_if.rd, csr_commit_if.data, csr_commit_if.eop},
         {alu_commit_if.wid, alu_commit_if.PC, alu_commit_if.tmask, alu_commit_if.rd, alu_commit_if.data, alu_commit_if.eop},
+        {bitmanip_commit_if.wid, bitmanip_commit_if.PC, bitmanip_commit_if.tmask, bitmanip_commit_if.rd, bitmanip_commit_if.data, bitmanip_commit_if.eop},
     `ifdef EXT_F_ENABLE
         {fpu_commit_if.wid, fpu_commit_if.PC, fpu_commit_if.tmask, fpu_commit_if.rd, fpu_commit_if.data, fpu_commit_if.eop},
     `endif
@@ -81,10 +84,12 @@ module VX_writeback #(
 `ifdef EXT_F_ENABLE
     assign fpu_commit_if.ready = rsp_ready[1] || ~fpu_commit_if.wb;
     assign alu_commit_if.ready = rsp_ready[2] || ~alu_commit_if.wb;
+    assign bitmanip_commit_if.ready = rsp_ready[5] || ~bitmanip_commit_if.wb;
     assign csr_commit_if.ready = rsp_ready[3] || ~csr_commit_if.wb;
     assign gpu_commit_if.ready = rsp_ready[4] || ~gpu_commit_if.wb;
 `else
     assign alu_commit_if.ready = rsp_ready[1] || ~alu_commit_if.wb;
+    assign bitmanip_commit_if.ready = rsp_ready[4] || ~bitmanip_commit_if.wb;
     assign csr_commit_if.ready = rsp_ready[2] || ~csr_commit_if.wb;
     assign gpu_commit_if.ready = rsp_ready[3] || ~gpu_commit_if.wb;
 `endif

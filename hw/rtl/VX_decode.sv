@@ -82,26 +82,45 @@ module VX_decode  #(
 
         case (opcode)            
             `INST_I: begin
-                ex_type = `EX_ALU;
                 case (func3)
                     3'h0: op_type = `INST_OP_BITS'(`INST_ALU_ADD);
                     3'h1: op_type = `INST_OP_BITS'(`INST_ALU_SLL);
                     3'h2: op_type = `INST_OP_BITS'(`INST_ALU_SLT);
                     3'h3: op_type = `INST_OP_BITS'(`INST_ALU_SLTU);
                     3'h4: op_type = `INST_OP_BITS'(`INST_ALU_XOR);
-                    3'h5: op_type = (func7[5]) ? `INST_OP_BITS'(`INST_ALU_SRA) : `INST_OP_BITS'(`INST_ALU_SRL);
+                    3'h5: begin
+                        if (u_12 == 12'h287) begin
+                            op_type = `INST_OP_BITS'(`INST_BITMANIP_ORCB);
+                        end
+                        else if (u_12 == 12'h698) begin
+                            op_type = `INST_OP_BITS'(`INST_BITMANIP_REV8);
+                        end
+                        else if (u_12 == 12'h30) begin
+                            op_type = `INST_OP_BITS'(`INST_BITMANIP_RORI);
+                        end
+                        else begin
+                           op_type = (func7[5]) ? `INST_OP_BITS'(`INST_ALU_SRA) : `INST_OP_BITS'(`INST_ALU_SRL);
+                        end
+                    end
                     3'h6: op_type = `INST_OP_BITS'(`INST_ALU_OR);
                     3'h7: op_type = `INST_OP_BITS'(`INST_ALU_AND);
                     default:;
                 endcase
+                ex_type = (op_type == `INST_OP_BITS'(`INST_BITMANIP_ORCB) || op_type == `INST_OP_BITS'(`INST_BITMANIP_REV8) || op_type == `INST_OP_BITS'(`INST_BITMANIP_RORI)) ? `EX_BITMANIP : `EX_ALU;
                 use_rd  = 1;
-                use_imm = 1;
+                use_imm = (op_type == `INST_OP_BITS'(`INST_BITMANIP_ORCB) || op_type == `INST_OP_BITS'(`INST_BITMANIP_REV8)) ? 0 : 1;
                 imm     = {{20{alu_imm[11]}}, alu_imm};
                 `USED_IREG (rd);
                 `USED_IREG (rs1);
             end
             `INST_R: begin 
-                ex_type = `EX_ALU;
+                if (func7 == 7'h30) begin
+                    case (func3)
+                        3'h1: op_type = `INST_OP_BITS'(`INST_BITMANIP_ROL);
+                        3'h5: op_type = `INST_OP_BITS'(`INST_BITMANIP_ROR);
+                        default:;
+                    endcase
+                end else
             `ifdef EXT_F_ENABLE
                 if (func7[0]) begin
                     case (func3)
@@ -131,6 +150,7 @@ module VX_decode  #(
                         default:;
                     endcase
                 end          
+                ex_type = (op_type == `INST_OP_BITS'(`INST_BITMANIP_ROL) || op_type == `INST_OP_BITS'(`INST_BITMANIP_ROR)) ? `EX_BITMANIP : `EX_ALU;
                 use_rd = 1;
                 `USED_IREG (rd);
                 `USED_IREG (rs1);

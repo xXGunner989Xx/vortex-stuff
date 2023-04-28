@@ -44,6 +44,7 @@
 `define EX_CSR          3'h3
 `define EX_FPU          3'h4
 `define EX_GPU          3'h5
+`define EX_BITMANIP     3'h6
 `define EX_BITS         3
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -197,6 +198,15 @@
 `define INST_GPU_PRED        4'h5
 `define INST_GPU_TEX         4'h6
 `define INST_GPU_BITS        4
+
+// bitmanip module optypes
+`define INST_BITMANIP_BITS   4
+`define INST_BITMANIP_ORCB   4'b0000
+`define INST_BITMANIP_REV8   4'b0001
+`define INST_BITMANIP_ROL    4'b0010
+`define INST_BITMANIP_ROR    4'b0011
+`define INST_BITMANIP_RORI   4'b0100
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

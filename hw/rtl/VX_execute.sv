@@ -25,6 +25,7 @@ module VX_execute #(
     
     // inputs    
     VX_alu_req_if.slave     alu_req_if,
+    VX_bitmanip_req_if.slave bitmanip_req_if,
     VX_lsu_req_if.slave     lsu_req_if,    
     VX_csr_req_if.slave     csr_req_if,  
 `ifdef EXT_F_ENABLE
@@ -36,6 +37,7 @@ module VX_execute #(
     VX_branch_ctl_if.master branch_ctl_if,    
     VX_warp_ctl_if.master   warp_ctl_if,
     VX_commit_if.master     alu_commit_if,
+    VX_commit_if.master     bitmanip_commit_if,
     VX_commit_if.master     ld_commit_if,
     VX_commit_if.master     st_commit_if,
     VX_commit_if.master     csr_commit_if,
@@ -131,6 +133,7 @@ module VX_execute #(
 `endif
 
     `RESET_RELAY (alu_reset);
+    `RESET_RELAY (bitmanip_reset);
     `RESET_RELAY (lsu_reset);
     `RESET_RELAY (csr_reset);
     `RESET_RELAY (gpu_reset);
@@ -143,6 +146,15 @@ module VX_execute #(
         .alu_req_if     (alu_req_if),
         .branch_ctl_if  (branch_ctl_if),
         .alu_commit_if  (alu_commit_if)
+    );
+
+    VX_bitmanip_unit #(
+        .CORE_ID(CORE_ID)
+    ) bitmanip_unit (
+        .clk            (clk),
+        .reset          (bitmanip_reset),
+        .bitmanip_req_if     (bitmanip_req_if),
+        .bitmanip_commit_if  (bitmanip_commit_if)
     );
 
     VX_lsu_unit #(

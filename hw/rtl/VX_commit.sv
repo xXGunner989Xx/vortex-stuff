@@ -8,6 +8,7 @@ module VX_commit #(
 
     // inputs
     VX_commit_if.slave      alu_commit_if,
+    VX_commit_if.slave      bitmanip_commit_if,
     VX_commit_if.slave      ld_commit_if,
     VX_commit_if.slave      st_commit_if, 
     VX_commit_if.slave      csr_commit_if,
@@ -23,6 +24,7 @@ module VX_commit #(
     // CSRs update
 
     wire alu_commit_fire = alu_commit_if.valid && alu_commit_if.ready;
+    wire bitmanip_commit_fire = bitmanip_commit_if.valid && bitmanip_commit_if.ready;
     wire ld_commit_fire  = ld_commit_if.valid && ld_commit_if.ready;
     wire st_commit_fire  = st_commit_if.valid && st_commit_if.ready;
     wire csr_commit_fire = csr_commit_if.valid && csr_commit_if.ready;
@@ -32,6 +34,7 @@ module VX_commit #(
     wire gpu_commit_fire = gpu_commit_if.valid && gpu_commit_if.ready;
 
     wire commit_fire = alu_commit_fire
+                    || bitmanip_commit_fire
                     || ld_commit_fire
                     || st_commit_fire
                     || csr_commit_fire
@@ -41,15 +44,16 @@ module VX_commit #(
                     || gpu_commit_fire;
 
 `ifdef EXT_F_ENABLE
-    wire [(6*`NUM_THREADS)-1:0] commit_tmask;
+    wire [(7*`NUM_THREADS)-1:0] commit_tmask;
 `else
-    wire [(5*`NUM_THREADS)-1:0] commit_tmask;
+    wire [(6*`NUM_THREADS)-1:0] commit_tmask;
 `endif
 
     wire [$clog2($bits(commit_tmask)+1)-1:0] commit_size;
 
     assign commit_tmask = {
         {`NUM_THREADS{alu_commit_fire}} & alu_commit_if.tmask,
+        {`NUM_THREADS{bitmanip_commit_fire}} & bitmanip_commit_if.tmask,
         {`NUM_THREADS{ld_commit_fire}}  & ld_commit_if.tmask, 
         {`NUM_THREADS{st_commit_fire}}  & st_commit_if.tmask,
         {`NUM_THREADS{csr_commit_fire}} & csr_commit_if.tmask,
@@ -81,6 +85,7 @@ module VX_commit #(
         .reset          (reset),
 
         .alu_commit_if  (alu_commit_if),
+        .bitmanip_commit_if  (bitmanip_commit_if),
         .ld_commit_if   (ld_commit_if),        
         .csr_commit_if  (csr_commit_if),
     `ifdef EXT_F_ENABLE
@@ -99,6 +104,11 @@ module VX_commit #(
              dpi_trace("%d: core%0d-commit: wid=%0d, PC=%0h, ex=ALU, tmask=%b, wb=%0d, rd=%0d, data=", $time, CORE_ID, alu_commit_if.wid, alu_commit_if.PC, alu_commit_if.tmask, alu_commit_if.wb, alu_commit_if.rd);
             `TRACE_ARRAY1D(alu_commit_if.data, `NUM_THREADS);
              dpi_trace(" (#%0d)\n", alu_commit_if.uuid);
+        end
+        if (bitmanip_commit_if.valid && bitmanip_commit_if.ready) begin
+             dpi_trace("%d: core%0d-commit: wid=%0d, PC=%0h, ex=BIT, tmask=%b, wb=%0d, rd=%0d, data=", $time, CORE_ID, bitmanip_commit_if.wid, bitmanip_commit_if.PC, bitmanip_commit_if.tmask, bitmanip_commit_if.wb, bitmanip_commit_if.rd);
+            `TRACE_ARRAY1D(bitmanip_commit_if.data, `NUM_THREADS);
+             dpi_trace(" (#%0d)\n", bitmanip_commit_if.uuid);
         end
         if (ld_commit_if.valid && ld_commit_if.ready) begin
              dpi_trace("%d: core%0d-commit: wid=%0d, PC=%0h, ex=LSU, tmask=%b, wb=%0d, rd=%0d, data=", $time, CORE_ID, ld_commit_if.wid, ld_commit_if.PC, ld_commit_if.tmask, ld_commit_if.wb, ld_commit_if.rd);

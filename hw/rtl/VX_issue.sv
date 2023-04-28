@@ -16,6 +16,7 @@ module VX_issue #(
     VX_writeback_if.slave   writeback_if,   
     
     VX_alu_req_if.master    alu_req_if,
+    VX_bitmanip_req_if.master    bitmanip_req_if,
     VX_lsu_req_if.master    lsu_req_if,    
     VX_csr_req_if.master    csr_req_if,
 `ifdef EXT_F_ENABLE
@@ -115,6 +116,7 @@ module VX_issue #(
         .ibuffer_if (dispatch_if),
         .gpr_rsp_if (gpr_rsp_if),
         .alu_req_if (alu_req_if),
+        .bitmanip_req_if (bitmanip_req_if),
         .lsu_req_if (lsu_req_if),        
         .csr_req_if (csr_req_if),
     `ifdef EXT_F_ENABLE
@@ -153,6 +155,7 @@ module VX_issue #(
     reg [`PERF_CTR_BITS-1:0] perf_ibf_stalls;
     reg [`PERF_CTR_BITS-1:0] perf_scb_stalls;
     reg [`PERF_CTR_BITS-1:0] perf_alu_stalls;
+    reg [`PERF_CTR_BITS-1:0] perf_bitmanip_stalls;
     reg [`PERF_CTR_BITS-1:0] perf_lsu_stalls;
     reg [`PERF_CTR_BITS-1:0] perf_csr_stalls;
     reg [`PERF_CTR_BITS-1:0] perf_gpu_stalls;
@@ -165,6 +168,7 @@ module VX_issue #(
             perf_ibf_stalls <= 0;
             perf_scb_stalls <= 0;
             perf_alu_stalls <= 0;
+            perf_bitmanip_stalls <= 0;
             perf_lsu_stalls <= 0;
             perf_csr_stalls <= 0;
             perf_gpu_stalls <= 0;
@@ -186,6 +190,7 @@ module VX_issue #(
             `endif
                 `EX_LSU: perf_lsu_stalls <= perf_lsu_stalls + `PERF_CTR_BITS'd1;
                 `EX_CSR: perf_csr_stalls <= perf_csr_stalls + `PERF_CTR_BITS'd1;
+                `EX_BITMANIP: perf_bitmanip_stalls <= perf_bitmanip_stalls + `PERF_CTR_BITS'd1;
                 //`EX_GPU:
                 default: perf_gpu_stalls <= perf_gpu_stalls + `PERF_CTR_BITS'd1;
                 endcase
@@ -213,6 +218,14 @@ module VX_issue #(
             dpi_trace(", rs2_data=");
             `TRACE_ARRAY1D(alu_req_if.rs2_data, `NUM_THREADS);
             dpi_trace(" (#%0d)\n", alu_req_if.uuid);
+        end
+        if (bitmanip_req_if.valid && bitmanip_req_if.ready) begin
+            dpi_trace("%d: core%0d-issue: wid=%0d, PC=%0h, ex=ALU, tmask=%b, rd=%0d, rs1_data=", 
+                $time, CORE_ID, bitmanip_req_if.wid, bitmanip_req_if.PC, bitmanip_req_if.tmask, bitmanip_req_if.rd);
+            `TRACE_ARRAY1D(bitmanip_req_if.rs1_data, `NUM_THREADS);
+            dpi_trace(", rs2_data=");
+            `TRACE_ARRAY1D(bitmanip_req_if.rs2_data, `NUM_THREADS);
+            dpi_trace(" (#%0d)\n", bitmanip_req_if.uuid);
         end
         if (lsu_req_if.valid && lsu_req_if.ready) begin
             dpi_trace("%d: core%0d-issue: wid=%0d, PC=%0h, ex=LSU, tmask=%b, rd=%0d, offset=%0h, addr=", 

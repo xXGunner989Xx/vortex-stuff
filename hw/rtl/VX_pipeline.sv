@@ -115,6 +115,7 @@ module VX_pipeline #(
     VX_warp_ctl_if      warp_ctl_if();
     VX_ifetch_rsp_if    ifetch_rsp_if();
     VX_alu_req_if       alu_req_if();
+    VX_bitmanip_req_if  bitmanip_req_if();
     VX_lsu_req_if       lsu_req_if();
     VX_csr_req_if       csr_req_if();
 `ifdef EXT_F_ENABLE 
@@ -125,6 +126,7 @@ module VX_pipeline #(
     VX_wstall_if        wstall_if();
     VX_join_if          join_if();
     VX_commit_if        alu_commit_if();
+    VX_commit_if        bitmanip_commit_if();
     VX_commit_if        ld_commit_if();
     VX_commit_if        st_commit_if();
     VX_commit_if        csr_commit_if();  
@@ -190,6 +192,7 @@ module VX_pipeline #(
         .writeback_if   (writeback_if),
 
         .alu_req_if     (alu_req_if),
+        .bitmanip_req_if(bitmanip_req_if),
         .lsu_req_if     (lsu_req_if),        
         .csr_req_if     (csr_req_if),
     `ifdef EXT_F_ENABLE
@@ -218,6 +221,7 @@ module VX_pipeline #(
         .fetch_to_csr_if(fetch_to_csr_if),              
         
         .alu_req_if     (alu_req_if),
+        .bitmanip_req_if (bitmanip_req_if),
         .lsu_req_if     (lsu_req_if),        
         .csr_req_if     (csr_req_if),
     `ifdef EXT_F_ENABLE
@@ -228,6 +232,7 @@ module VX_pipeline #(
         .warp_ctl_if    (warp_ctl_if),
         .branch_ctl_if  (branch_ctl_if),        
         .alu_commit_if  (alu_commit_if),
+        .bitmanip_commit_if(bitmanip_commit_if),
         .ld_commit_if   (ld_commit_if),        
         .st_commit_if   (st_commit_if),       
         .csr_commit_if  (csr_commit_if),
@@ -246,6 +251,7 @@ module VX_pipeline #(
         .reset          (commit_reset),
 
         .alu_commit_if  (alu_commit_if),
+        .bitmanip_commit_if(bitmanip_commit_if),
         .ld_commit_if   (ld_commit_if),        
         .st_commit_if   (st_commit_if),
         .csr_commit_if  (csr_commit_if),

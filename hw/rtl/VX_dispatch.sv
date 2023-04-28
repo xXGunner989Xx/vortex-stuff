@@ -10,6 +10,7 @@ module VX_dispatch (
 
     // outputs
     VX_alu_req_if.master    alu_req_if,
+    VX_bitmanip_req_if.master    bitmanip_req_if,
     VX_lsu_req_if.master    lsu_req_if,
     VX_csr_req_if.master    csr_req_if,
 `ifdef EXT_F_ENABLE
@@ -19,6 +20,7 @@ module VX_dispatch (
 );
     wire [`NT_BITS-1:0] tid;
     wire alu_req_ready;
+    wire bitmanip_req_ready;
     wire lsu_req_ready;
     wire csr_req_ready;
 `ifdef EXT_F_ENABLE
@@ -53,6 +55,25 @@ module VX_dispatch (
         .data_out  ({alu_req_if.uuid, alu_req_if.wid, alu_req_if.tmask, alu_req_if.PC, alu_req_if.next_PC, alu_req_if.op_type, alu_req_if.op_mod, alu_req_if.imm, alu_req_if.use_PC, alu_req_if.use_imm, alu_req_if.rd, alu_req_if.wb, alu_req_if.tid, alu_req_if.rs1_data, alu_req_if.rs2_data}),
         .valid_out (alu_req_if.valid),
         .ready_out (alu_req_if.ready)
+    );
+
+    // bitmanip unit
+
+    wire bitmanip_req_valid = ibuffer_if.valid && (ibuffer_if.ex_type == `EX_BITMANIP);
+    wire [`INST_BITMANIP_BITS-1:0] bitmanip_op_type = `INST_BITMANIP_BITS'(ibuffer_if.op_type);
+    
+    VX_skid_buffer #(
+        .DATAW   (`UUID_BITS + `NW_BITS + `NUM_THREADS + 32 + `INST_BITMANIP_BITS + `INST_MOD_BITS + 32 + 1 + `NR_BITS + 1 + (2 * `NUM_THREADS * 32)),
+        .OUT_REG (1)
+    ) bitmanip_buffer (
+        .clk       (clk),
+        .reset     (reset),
+        .valid_in  (bitmanip_req_valid),
+        .ready_in  (bitmanip_req_ready),
+        .data_in   ({ibuffer_if.uuid,      ibuffer_if.wid,      ibuffer_if.tmask,      ibuffer_if.PC,      bitmanip_op_type,        ibuffer_if.op_mod,      ibuffer_if.imm,      ibuffer_if.use_imm,      ibuffer_if.rd,      ibuffer_if.wb,      gpr_rsp_if.rs1_data,      gpr_rsp_if.rs2_data}),
+        .data_out  ({bitmanip_req_if.uuid, bitmanip_req_if.wid, bitmanip_req_if.tmask, bitmanip_req_if.PC, bitmanip_req_if.op_type, bitmanip_req_if.op_mod, bitmanip_req_if.imm, bitmanip_req_if.use_imm, bitmanip_req_if.rd, bitmanip_req_if.wb, bitmanip_req_if.rs1_data, bitmanip_req_if.rs2_data}),
+        .valid_out (bitmanip_req_if.valid),
+        .ready_out (bitmanip_req_if.ready)
     );
 
     // lsu unit
@@ -145,6 +166,7 @@ module VX_dispatch (
     always @(*) begin
         case (ibuffer_if.ex_type) 
         `EX_ALU: ready_r = alu_req_ready;
+        `EX_BITMANIP: ready_r = bitmanip_req_ready;
         `EX_LSU: ready_r = lsu_req_ready;
         `EX_CSR: ready_r = csr_req_ready;
     `ifdef EXT_F_ENABLE

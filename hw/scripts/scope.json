@@ -63,11 +63,13 @@
         "VX_issue": {},
         "VX_execute": {                  
             "submodules": {
+                "bitmanip_unit": {"type":"VX_bitmanip_unit"},
                 "lsu_unit": {"type":"VX_lsu_unit"},
                 "gpu_unit": {"type":"VX_gpu_unit"}
             }
         },
         "VX_commit": {},
+        "VX_bitmanip_unit": {},
         "VX_lsu_unit": {},
         "VX_gpu_unit": {},
         "VX_mem_unit": {
