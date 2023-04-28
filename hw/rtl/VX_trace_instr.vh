@@ -8,6 +8,7 @@ task trace_ex_type (
 );
     case (ex_type)
         `EX_ALU: dpi_trace("ALU");     
+        `EX_BITMANIP: dpi_trace("BITMANIP");     
         `EX_LSU: dpi_trace("LSU");
         `EX_CSR: dpi_trace("CSR");
         `EX_FPU: dpi_trace("FPU");
@@ -69,6 +70,16 @@ task trace_ex_op (
                 default:    dpi_trace("?");
             endcase         
         end
+    end
+    `EX_BITMANIP: begin
+        case (`INST_BITMANIP_BITS'(op_type))
+            `INST_BITMANIP_ORCB:  dpi_trace("ORCB");
+            `INST_BITMANIP_REV8:  dpi_trace("REV8");
+            `INST_BITMANIP_ROL:   dpi_trace("ROL");
+            `INST_BITMANIP_ROR:   dpi_trace("ROR");
+            `INST_BITMANIP_RORI: dpi_trace("RORI");
+            default:    dpi_trace("?");
+        endcase         
     end
     `EX_LSU: begin
         if (op_mod == 0) begin
