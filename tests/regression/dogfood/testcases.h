@@ -614,7 +614,7 @@ public:
     auto c = (uint32_t*)dst;
     for (int i = 0; i < n; ++i) {
       
-      auto ref = ((a[i] >> (b[i] & 0b1111)) | (a[i] << (32 - (b[i] & 0b1111)))); 
+      auto ref = ((a[i] >> (b[i] & 0b11111)) | (a[i] << (32 - (b[i] & 0b11111)))); 
       if (c[i] != ref) {
         std::cout << "error at result #" << i << ": expected=" << ref << ", actual=" << c[i] << ", a=" << a[i] << ", b=" << b[i] << std::endl;
         ++errors;
@@ -639,7 +639,7 @@ public:
     auto c = (uint32_t*)dst;
     for (int i = 0; i < n; ++i) {
       
-      auto ref = ((a[i] << (b[i] & 0b1111)) | (a[i] >> (32 - (b[i] & 0b1111)))); 
+      auto ref = ((a[i] << (b[i] & 0b11111)) | (a[i] >> (32 - (b[i] & 0b11111)))); 
       if (c[i] != ref) {
         std::cout << "error at result #" << i << ": expected=" << ref << ", actual=" << c[i] << ", a=" << a[i] << ", b=" << b[i] << std::endl;
         ++errors;
@@ -664,7 +664,7 @@ public:
     auto c = (uint32_t*)dst;
     for (int i = 0; i < n; ++i) {
       
-      auto ref = ((a[i] >> (b[i] & 0b1111)) | (a[i] << (32 - (b[i] & 0b1111)))); 
+      auto ref = ((a[i] >> (b[i] & 0b11111)) | (a[i] << (32 - (b[i] & 0b11111)))); 
       if (c[i] != ref) {
         std::cout << "error at result #" << i << ": expected=" << ref << ", actual=" << c[i] << ", a=" << a[i] << ", b=" << b[i] << std::endl;
         ++errors;
