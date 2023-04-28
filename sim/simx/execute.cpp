@@ -206,13 +206,13 @@ void Warp::execute(const Instr &instr, pipeline_trace_t *trace) {
         switch (func3) {
           case 1: {
             // RV32 Zbb: ROL
-            int shamt = rsdata[t][1].i & 0b1111;
+            int shamt = rsdata[t][1].i & 0b11111;
             rddata[t].i = (rsdata[t][0].i << shamt | rsdata[t][0].i >> (XLEN - shamt));
             break;
           }
           case 5: {
             // RV32 Zbb: ROR
-            int shamt = rsdata[t][1].i & 0b1111;
+            int shamt = rsdata[t][1].i & 0b11111;
             rddata[t].i = (rsdata[t][0].i >> shamt | rsdata[t][0].i << (XLEN - shamt));
             break;
           }
